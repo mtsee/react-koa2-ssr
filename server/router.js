@@ -12,7 +12,7 @@ export const setRouter = app => {
   app.use(
     koaStatic(path.join(__dirname, "../build"), {
       maxage: 365 * 24 * 60 * 1000,
-      extensions: ['html']
+      index: 'root'
     })
   );
 

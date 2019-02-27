@@ -7,6 +7,8 @@ import responseTime from "koa-response-time";
 import session from "koa-session";
 import { setRouter } from "./router";
 
+// import csshook from 'css-modules-require-hook/preset'; // 处理css
+
 // import path from "path";
 // import views from "koa-views";
 
