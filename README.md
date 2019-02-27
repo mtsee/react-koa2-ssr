@@ -99,6 +99,7 @@ export default App;
 ```
 
 在项目中新建server目录，用于存放服务端代码。为了简化，我这里只有2个文件，项目中我们用的ES6，所以还要配置下.babelrc
+
 ![图片描述][4]
 
 > .babelrc 配置，因为要使用到ES6
