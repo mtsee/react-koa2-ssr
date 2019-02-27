@@ -2,7 +2,6 @@ import App from '../src/App';
 import Koa from 'koa';
 import React from 'react';
 import Router from 'koa-router';
-import body from 'koa-body';
 import fs from 'fs';
 import koaStatic from 'koa-static';
 import path from 'path';
@@ -13,17 +12,15 @@ const config = {
   port: 3030
 };
 
-// 实例化
+// 实例化 koa
 const app = new Koa();
-
-// session
-app.use(body({ multipart: true }));
 
 // 静态资源
 app.use(
   koaStatic(path.join(__dirname, '../build'), {
     maxage: 365 * 24 * 60 * 1000,
-    index: 'root'
+    index: 'root' 
+    // 这里配置不要写成'index'就可以了，因为在访问localhost:3030时，不能让服务默认去加载index.html文件，这里很容易掉进坑。
   })
 );
 
@@ -34,7 +31,7 @@ app.use(
       ctx.response.type = 'html'; //指定content type
       let shtml = '';
       await new Promise((resolve, reject) => {
-        fs.readFile(path.join(__dirname, '../build/index.html'), 'utf8', function(err, data) {
+        fs.readFile(path.join(__dirname, '../build/index.html'), 'utfa8', function(err, data) {
           if (err) {
             reject();
             return console.log(err);
@@ -43,6 +40,7 @@ app.use(
           resolve();
         });
       });
+      // 替换掉 {{root}} 为我们生成后的HTML
       ctx.response.body = shtml.replace('{{root}}', renderToString(<App />));
     })
     .routes()
