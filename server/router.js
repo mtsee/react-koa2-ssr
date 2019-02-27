@@ -10,8 +10,9 @@ import { renderToString } from "react-dom/server";
 export const setRouter = app => {
   // 静态资源
   app.use(
-    koaStatic(path.join(__dirname, "../build/static"), {
-      maxage: 365 * 24 * 60 * 1000
+    koaStatic(path.join(__dirname, "../build"), {
+      maxage: 365 * 24 * 60 * 1000,
+      extensions: ['html']
     })
   );
 
