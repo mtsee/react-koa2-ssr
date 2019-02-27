@@ -1,17 +1,14 @@
-import Koa from "koa";
-import body from "koa-body";
-import cors from "koa-cors";
-import helmet from "koa-helmet";
-import logger from "koa-logger";
-import responseTime from "koa-response-time";
-import session from "koa-session";
-import { setRouter } from "./router";
+import App from '../src/App';
+import Koa from 'koa';
+import React from 'react';
+import Router from 'koa-router';
+import body from 'koa-body';
+import fs from 'fs';
+import koaStatic from 'koa-static';
+import path from 'path';
+import { renderToString } from 'react-dom/server';
 
-// import csshook from 'css-modules-require-hook/preset'; // 处理css
-
-// import path from "path";
-// import views from "koa-views";
-
+// 配置文件
 const config = {
   port: 3030
 };
@@ -19,32 +16,38 @@ const config = {
 // 实例化
 const app = new Koa();
 
-// 日志
-app.use(logger());
-app.use(responseTime());
-app.use(helmet());
-
 // session
-app.keys = ["bbdweb"]; // secret
-app.use(
-  session(
-    {
-      key: "userinfo", // cookie名称
-      maxAge: 1000 * 60 * 60 * 8, // 8小时
-      overwrite: true /** (boolean) can overwrite or not (default true) */,
-      httpOnly: true /** (boolean) httpOnly or not (default true) */,
-      signed: true /** (boolean) signed or not (default true) */,
-      rolling: false // 强制为每个用户设置session
-    },
-    app
-  )
-);
-app.use(cors());
 app.use(body({ multipart: true }));
 
+// 静态资源
+app.use(
+  koaStatic(path.join(__dirname, '../build'), {
+    maxage: 365 * 24 * 60 * 1000,
+    index: 'root'
+  })
+);
+
 // 设置路由
-setRouter(app);
+app.use(
+  new Router()
+    .get('*', async (ctx, next) => {
+      ctx.response.type = 'html'; //指定content type
+      let shtml = '';
+      await new Promise((resolve, reject) => {
+        fs.readFile(path.join(__dirname, '../build/index.html'), 'utf8', function(err, data) {
+          if (err) {
+            reject();
+            return console.log(err);
+          }
+          shtml = data;
+          resolve();
+        });
+      });
+      ctx.response.body = shtml.replace('{{root}}', renderToString(<App />));
+    })
+    .routes()
+);
 
 app.listen(config.port, function() {
-  console.log("服务器启动，监听 port： " + config.port + "  running~");
+  console.log('服务器启动，监听 port： ' + config.port + '  running~');
 });
