@@ -31,7 +31,7 @@ app.use(
       ctx.response.type = 'html'; //指定content type
       let shtml = '';
       await new Promise((resolve, reject) => {
-        fs.readFile(path.join(__dirname, '../build/index.html'), 'utfa8', function(err, data) {
+        fs.readFile(path.join(__dirname, '../build/index.html'), 'utf-8', function(err, data) {
           if (err) {
             reject();
             return console.log(err);
